@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <gradient
+        android:angle="270"
+        android:startColor="#9C2CF3"
+        android:endColor="#3A49F9"/>
+
+    <!-- Redondear solo la parte inferior -->
+    <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="2dp"/>
+</shape>

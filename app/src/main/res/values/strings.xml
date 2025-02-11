@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Mi Aplicación</string>
+    <string name="saludo">¡Hola, Karina!</string>
+    <string name="tareas_completadas">0 de 4 tareas completadas</string>
+    <string name="fecha">Lunes 3 Oct, 2024</string>
+    <string name="mi_dia">Mi día</string>
+    <string name="icono_sol" translatable="false">Ícono de sol</string>
+    <string name="boton_agregar_tarea">Añadir nueva tarea</string>
+
+    <!-- Textos faltantes -->
+    <string name="volver">Volver</string>
+    <string name="notificaciones">Notificaciones</string>
+    <string name="mi_familia">Mi familia</string>
+    <string name="imagen_familia">Imagen representativa de la familia</string>
+    <string name="anadir_miembro">Añadir nuevo miembro</string>
+</resources>
+
