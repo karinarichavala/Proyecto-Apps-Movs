@@ -51,6 +51,15 @@ class MainActivity : AppCompatActivity() {
         val adapter = TareaAdapter(tareasDelDia)
         recyclerView.adapter = adapter
 
+        // Configurar el botón de agregar tarea
+        // Usa FloatingActionButton en lugar de Button
+        val btnAgregarTarea = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btnAgregarTarea)
+        btnAgregarTarea.setOnClickListener {
+            // Crear una instancia de TaskManager y mostrar el diálogo
+            val taskManager = TaskManager(this)
+            taskManager.showAddTaskDialog()  // Mostrar el diálogo para agregar tarea
+        }
+
     }
 
     fun irActividad(clase:Class<*>){

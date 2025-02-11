@@ -66,7 +66,7 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
     // ---------------- MÉTODOS PARA AGREGAR DATOS ----------------
 
     // Método para agregar una tarea
-    fun agregarTarea(tarea: CTarea, idMiembro: Int): Boolean {
+    fun agregarTarea(tarea: Tarea, idMiembro: Int): Boolean {
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre_tarea", tarea.nombre_tarea)
@@ -110,15 +110,15 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
     }
 
     //CONSULTAR
-    fun obtenerTareasDelDia(): List<CTarea> {
+    fun obtenerTareasDelDia(): List<Tarea> {
         val db = readableDatabase
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) // Formato de fecha
         val cursor = db.rawQuery("SELECT * FROM Tareas WHERE fecha = ?", arrayOf(today))
-        val tareas = mutableListOf<CTarea>()
+        val tareas = mutableListOf<Tarea>()
 
         if (cursor.moveToFirst()) {
             do {
-                val tarea = CTarea(
+                val tarea = Tarea(
                     cursor.getInt(0), // id_tarea
                     cursor.getString(1), // nombre_tarea
                     cursor.getString(2), // fecha

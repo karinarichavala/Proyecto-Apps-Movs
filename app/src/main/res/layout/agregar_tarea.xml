@@ -88,8 +88,16 @@
                 android:id="@+id/txtFecha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Oct 24, 2024"
-                android:textSize="16sp"/>
+                android:text="Elegir la fecha"
+                android:textSize="16sp" />
+
+            <!-- Flecha hacia abajo -->
+            <ImageView
+                android:id="@+id/arrowDown"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_down"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
         <!-- Campos: Hora de inicio y Hora de fin -->
@@ -119,6 +127,7 @@
                     android:text="01:22 pm"
                     android:textSize="18sp"
                     android:textStyle="bold"/>
+
             </LinearLayout>
 
             <LinearLayout

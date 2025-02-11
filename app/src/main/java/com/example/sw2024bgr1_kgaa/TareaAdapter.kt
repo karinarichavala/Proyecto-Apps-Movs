@@ -6,7 +6,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class TareaAdapter (private val tareas: List<CTarea>) : RecyclerView.Adapter<TareaAdapter.TareaViewHolder>() {
+class TareaAdapter (private var tareas: List<Tarea>) : RecyclerView.Adapter<TareaAdapter.TareaViewHolder>() {
+    // Este método es importante para actualizar las tareas en el RecyclerView
+    fun setTareas(tareas: List<Tarea>) {
+        this.tareas = tareas
+        notifyDataSetChanged() // Notifica que los datos han cambiado
+    }
 
     // Crear las vistas para cada elemento de la lista
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TareaViewHolder {
@@ -29,7 +34,7 @@ class TareaAdapter (private val tareas: List<CTarea>) : RecyclerView.Adapter<Tar
         private val horaTarea: TextView = itemView.findViewById(R.id.tarea_hora) // Referencia a la hora de la tarea
 
         // Vincula los datos de la tarea a los elementos de la vista
-        fun bind(tarea: CTarea) {
+        fun bind(tarea: Tarea) {
             nombreTarea.text = tarea.nombre_tarea
             horaTarea.text = "${tarea.hora_inicio} - ${tarea.hora_fin}" // Muestra el rango de hora
         }
