@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:padding="0dp">
 
-    <!-- Barra morada con bordes redondeados -->
+    <!-- Barra superior morada con bordes redondeados -->
     <View
         android:id="@+id/barraSuperior"
         android:layout_width="match_parent"
@@ -21,9 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Ícono de sol -->
-
-    <!-- Fecha dentro de la barra -->
+    <!-- Ícono de sol y fecha -->
     <ImageView
         android:id="@+id/imgIconoSol"
         android:layout_width="48dp"
@@ -34,18 +32,6 @@
         android:src="@drawable/ic_sun"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/barraSuperior" />
-
-    <!-- Mensaje Motivacional -->
-
-    <!-- Saludo después de la barra -->
-
-    <!-- Subtexto del saludo -->
-
-    <!-- Contador de tareas -->
-
-    <!-- Progreso de tareas -->
-
-    <!-- Lista de tareas -->
 
     <TextView
         android:id="@+id/txtFecha"
@@ -60,6 +46,7 @@
         app:layout_constraintStart_toEndOf="@id/imgIconoSol"
         app:layout_constraintTop_toTopOf="@id/imgIconoSol" />
 
+    <!-- Mensaje motivacional -->
     <TextView
         android:id="@+id/txtMotivacion"
         android:layout_width="wrap_content"
@@ -69,52 +56,46 @@
         android:textColor="#848484"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtFecha" />
 
+    <!-- Saludo -->
     <TextView
         android:id="@+id/txtSaludo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="132dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:text="@string/saludo"
         android:textColor="#2E3A59"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.124"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barraSuperior" />
+        app:layout_constraintTop_toBottomOf="@id/txtMotivacion" />
 
+    <!-- Subtexto del saludo -->
     <TextView
         android:id="@+id/txtSubSaludo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         android:text="Ten un hermoso día"
         android:textColor="#848484"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.114"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txtSaludo"
         app:layout_constraintTop_toBottomOf="@id/txtSaludo" />
 
-
-    <!-- Botón flotante -->
-
+    <!-- Contador de tareas y barra de progreso -->
     <TextView
         android:id="@+id/txtContadorTareas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:text="@string/tareas_completadas"
         android:textColor="#2E3A59"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txtSaludo"
         app:layout_constraintTop_toBottomOf="@id/txtSubSaludo" />
-
 
     <ProgressBar
         android:id="@+id/progresoTareas"
@@ -126,58 +107,119 @@
         android:progress="0"
         app:layout_constraintBottom_toBottomOf="@id/txtContadorTareas"
         app:layout_constraintStart_toEndOf="@id/txtContadorTareas"
-        app:layout_constraintTop_toTopOf="@id/txtContadorTareas"
-        app:layout_constraintVertical_bias="0.533" />
+        app:layout_constraintTop_toTopOf="@id/txtContadorTareas" />
 
+    <!-- Título "Mi día" y lista de tareas -->
     <TextView
         android:id="@+id/txtMiDia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:text="@string/mi_dia"
         android:textColor="#2E3A59"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txtContadorTareas"
         app:layout_constraintTop_toBottomOf="@id/txtContadorTareas" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerTareas"
-        android:layout_width="288dp"
-        android:layout_height="268dp"
-        android:paddingTop="8dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-        app:layout_constraintTop_toBottomOf="@id/txtMiDia"
-        app:layout_constraintVertical_bias="1.0"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="68dp" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintBottom_toTopOf="@id/navigationLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtMiDia" />
 
+    <!-- Botón flotante para agregar tarea -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAgregarTarea"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="16dp"
         android:contentDescription="@string/boton_agregar_tarea"
         android:src="@drawable/ic_add"
         app:backgroundTint="#6b3bf6"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navigationLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:maxImageSize="40dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Menú de navegación -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <!-- Layout de navegación personalizado -->
+    <LinearLayout
+        android:id="@+id/navigationLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:itemIconTint="#848484"
-        app:itemTextColor="#848484"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/menu_navegacion" />
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Botón Inicio -->
+        <LinearLayout
+            android:id="@+id/menu_inicio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inicio"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <!-- Botón Familia -->
+        <LinearLayout
+            android:id="@+id/menu_familia"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_profile"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mi Familia"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <!-- Botón Calendario -->
+        <LinearLayout
+            android:id="@+id/menu_calendario"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_calendar"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calendario"
+                android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,17 +5,15 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.icu.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class BDHelper(contexto: Context?) : SQLiteOpenHelper(
     contexto,
-    "GestorTareasFamiliaDB", // Nombre de la base de datos
+    "GestorTareasFamiliaDB",
     null,
     1
 ) {
     override fun onCreate(db: SQLiteDatabase?) {
-        // Crear tabla Tareas
         val scriptCrearTablaTareas = """
             CREATE TABLE Tareas (
                 id_tarea INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +27,6 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
         """.trimIndent()
         db?.execSQL(scriptCrearTablaTareas)
 
-        // Crear tabla MiembrosFamilia
         val scriptCrearTablaMiembros = """
             CREATE TABLE MiembrosFamilia (
                 id_miembro INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +39,6 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
         """.trimIndent()
         db?.execSQL(scriptCrearTablaMiembros)
 
-        // Crear tabla Responsables
         val scriptCrearTablaResponsables = """
             CREATE TABLE Responsables (
                 id_responsable INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,9 +59,7 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    // ---------------- MÉTODOS PARA AGREGAR DATOS ----------------
-
-    // Método para agregar una tarea
+    // Métodos para Tareas
     fun agregarTarea(tarea: Tarea, idMiembro: Int): Boolean {
         val db = writableDatabase
         val valores = ContentValues().apply {
@@ -77,24 +71,60 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
             put("estado_tarea", tarea.estado_tarea)
         }
 
-        // Insertar la tarea
         val idTarea = db.insert("Tareas", null, valores)
 
-        // Si la tarea se inserta correctamente, asignamos un responsable
         if (idTarea != -1L) {
             val valoresResponsable = ContentValues().apply {
                 put("id_tarea", idTarea)
                 put("id_miembro", idMiembro)
-                put("notificaciones_enviadas", false)  // Inicializamos como falso
+                put("notificaciones_enviadas", false)
             }
-            db.insert("Responsables", null, valoresResponsable)
+            val idResponsable = db.insert("Responsables", null, valoresResponsable)
+            db.close()
+            return idResponsable != -1L
         }
 
         db.close()
-        return idTarea != -1L
+        return false
     }
 
-    // Método para agregar un miembro de la familia
+    fun obtenerTareasDelDia(): List<Tarea> {
+        val db = readableDatabase
+        val fechaActual = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
+
+        val cursor = db.query(
+            "Tareas",
+            null,
+            "fecha = ?",
+            arrayOf(fechaActual),
+            null,
+            null,
+            "hora_inicio ASC"
+        )
+
+        val tareas = mutableListOf<Tarea>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val tarea = Tarea(
+                    id_tarea = cursor.getInt(cursor.getColumnIndexOrThrow("id_tarea")),
+                    nombre_tarea = cursor.getString(cursor.getColumnIndexOrThrow("nombre_tarea")),
+                    fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha")),
+                    hora_inicio = cursor.getString(cursor.getColumnIndexOrThrow("hora_inicio")),
+                    hora_fin = cursor.getString(cursor.getColumnIndexOrThrow("hora_fin")),
+                    descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion")),
+                    estado_tarea = cursor.getString(cursor.getColumnIndexOrThrow("estado_tarea"))
+                )
+                tareas.add(tarea)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return tareas
+    }
+
+    // Métodos para Miembros de Familia
     fun agregarMiembro(miembro: CMiembroFamilia): Boolean {
         val db = writableDatabase
         val valores = ContentValues().apply {
@@ -104,36 +134,140 @@ class BDHelper(contexto: Context?) : SQLiteOpenHelper(
             put("telefono", miembro.telefono)
             put("fecha_registro", miembro.fecha_registro)
         }
+
         val idMiembro = db.insert("MiembrosFamilia", null, valores)
         db.close()
         return idMiembro != -1L
     }
 
-    //CONSULTAR
-    fun obtenerTareasDelDia(): List<Tarea> {
+    fun obtenerMiembrosFamilia(): List<CMiembroFamilia> {
         val db = readableDatabase
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) // Formato de fecha
-        val cursor = db.rawQuery("SELECT * FROM Tareas WHERE fecha = ?", arrayOf(today))
+        val miembros = mutableListOf<CMiembroFamilia>()
+
+        val cursor = db.query(
+            "MiembrosFamilia",
+            null,
+            null,
+            null,
+            null,
+            null,
+            "nombre ASC"
+        )
+
+        if (cursor.moveToFirst()) {
+            do {
+                val miembro = CMiembroFamilia(
+                    id_miembro = cursor.getInt(cursor.getColumnIndexOrThrow("id_miembro")),
+                    nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre")),
+                    rol = cursor.getString(cursor.getColumnIndexOrThrow("rol")),
+                    correo_electronico = cursor.getString(cursor.getColumnIndexOrThrow("correo_electronico")),
+                    telefono = cursor.getString(cursor.getColumnIndexOrThrow("telefono")),
+                    fecha_registro = cursor.getString(cursor.getColumnIndexOrThrow("fecha_registro"))
+                )
+                miembros.add(miembro)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return miembros
+    }
+
+    fun obtenerTareasPorMiembro(idMiembro: Int): List<Tarea> {
+        val db = readableDatabase
+        val tareas = mutableListOf<Tarea>()
+
+        val query = """
+            SELECT t.* FROM Tareas t
+            INNER JOIN Responsables r ON t.id_tarea = r.id_tarea
+            WHERE r.id_miembro = ?
+            ORDER BY t.fecha ASC, t.hora_inicio ASC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(idMiembro.toString()))
+
+        if (cursor.moveToFirst()) {
+            do {
+                val tarea = Tarea(
+                    id_tarea = cursor.getInt(cursor.getColumnIndexOrThrow("id_tarea")),
+                    nombre_tarea = cursor.getString(cursor.getColumnIndexOrThrow("nombre_tarea")),
+                    fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha")),
+                    hora_inicio = cursor.getString(cursor.getColumnIndexOrThrow("hora_inicio")),
+                    hora_fin = cursor.getString(cursor.getColumnIndexOrThrow("hora_fin")),
+                    descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion")),
+                    estado_tarea = cursor.getString(cursor.getColumnIndexOrThrow("estado_tarea"))
+                )
+                tareas.add(tarea)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return tareas
+    }
+
+    fun obtenerTareasPorFechaYMiembro(fecha: String, idMiembro: Int): List<Tarea> {
+        val db = readableDatabase
+        val tareas = mutableListOf<Tarea>()
+
+        val query = """
+            SELECT t.* FROM Tareas t
+            INNER JOIN Responsables r ON t.id_tarea = r.id_tarea
+            WHERE t.fecha = ? AND r.id_miembro = ?
+            ORDER BY t.hora_inicio ASC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(fecha, idMiembro.toString()))
+
+        if (cursor.moveToFirst()) {
+            do {
+                val tarea = Tarea(
+                    id_tarea = cursor.getInt(cursor.getColumnIndexOrThrow("id_tarea")),
+                    nombre_tarea = cursor.getString(cursor.getColumnIndexOrThrow("nombre_tarea")),
+                    fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha")),
+                    hora_inicio = cursor.getString(cursor.getColumnIndexOrThrow("hora_inicio")),
+                    hora_fin = cursor.getString(cursor.getColumnIndexOrThrow("hora_fin")),
+                    descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion")),
+                    estado_tarea = cursor.getString(cursor.getColumnIndexOrThrow("estado_tarea"))
+                )
+                tareas.add(tarea)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return tareas
+    }
+
+    fun obtenerTareasPorFecha(fecha: String): List<Tarea> {
+        val db = readableDatabase
+        val cursor = db.query(
+            "Tareas",
+            null,
+            "fecha = ?",
+            arrayOf(fecha),
+            null,
+            null,
+            "hora_inicio ASC"
+        )
+
         val tareas = mutableListOf<Tarea>()
 
         if (cursor.moveToFirst()) {
             do {
                 val tarea = Tarea(
-                    cursor.getInt(0), // id_tarea
-                    cursor.getString(1), // nombre_tarea
-                    cursor.getString(2), // fecha
-                    cursor.getString(3), // hora_inicio
-                    cursor.getString(4), // hora_fin
-                    cursor.getString(5), // descripcion
-                    cursor.getString(6)  // estado_tarea
+                    id_tarea = cursor.getInt(cursor.getColumnIndexOrThrow("id_tarea")),
+                    nombre_tarea = cursor.getString(cursor.getColumnIndexOrThrow("nombre_tarea")),
+                    fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha")),
+                    hora_inicio = cursor.getString(cursor.getColumnIndexOrThrow("hora_inicio")),
+                    hora_fin = cursor.getString(cursor.getColumnIndexOrThrow("hora_fin")),
+                    descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion")),
+                    estado_tarea = cursor.getString(cursor.getColumnIndexOrThrow("estado_tarea"))
                 )
                 tareas.add(tarea)
             } while (cursor.moveToNext())
         }
+
         cursor.close()
         db.close()
-
         return tareas
     }
-
 }
